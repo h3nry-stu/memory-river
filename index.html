@@ -1,0 +1,39 @@
+<!doctype html>
+<html lang="zh-CN" class="dark">
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+    <meta name="color-scheme" content="dark" />
+    <meta name="theme-color" content="#05060f" />
+    <meta
+      name="description"
+      content="记忆长河 —— 照片化成粒子汇入宇宙光河，每一张都是一个 AI 记忆分身。"
+    />
+    <title>记忆长河 · 照片汇入光河</title>
+    <style>
+      /* 先铺底色，避免 canvas 起来前的白闪（与 config.PALETTE.cosmos 对齐） */
+      html,
+      body {
+        margin: 0;
+        background: radial-gradient(120% 90% at 50% 0%, #0a0f1f 0%, #05060f 62%, #04050c 100%);
+        color: #dfe9ff;
+      }
+      #root:empty::after {
+        content: '正在打捞记忆…';
+        position: fixed;
+        inset: 0;
+        display: grid;
+        place-items: center;
+        font: 300 13px/1.6 ui-sans-serif, system-ui, sans-serif;
+        letter-spacing: 0.28em;
+        color: rgb(159 216 255 / 0.45);
+      }
+    </style>
+  </head>
+  <body>
+    <div id="root"></div>
+    <noscript>《记忆长河》需要开启 JavaScript 才能展开。</noscript>
+    <script type="module" src="/src/main.tsx"></script>
+  </body>
+</html>

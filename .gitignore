@@ -1,0 +1,29 @@
+# 依赖与构建产物
+node_modules/
+dist/
+dist-ssr/
+*.local
+.vite/
+
+# 派生产物：由 `pnpm prepare:assets` 从 node_modules / CDN 再生（33MB）
+public/mediapipe/
+
+# 编辑器 / 系统
+.DS_Store
+.idea/
+.vscode/*
+!.vscode/extensions.json
+*.tsbuildinfo
+
+# 日志
+*.log
+npm-debug.log*
+pnpm-debug.log*
+
+# pnpm 内容寻址缓存（本机 store 落在项目内）
+.pnpm-store/
+
+# 本地密钥（.env.example 才是模板）
+.env
+.env.local
+.env.*.local

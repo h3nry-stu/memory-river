@@ -1,0 +1,177 @@
+@import 'tailwindcss';
+
+/**
+ * Tailwind 设计令牌。
+ * 这里的色值必须与 `src/config.ts` 的 PALETTE 保持一致 ——
+ * config.ts 是**行为**的唯一真源（canvas / 手势 / 音频），
+ * 本 @theme 只负责让 UI 层能用 utility class 消费同一套颜色。
+ */
+@theme {
+  --color-cosmos-near: #05060f;
+  --color-cosmos-far: #0a0f1f;
+  --color-cosmos-deep: #04050c;
+
+  --color-mood-warm: #ffb86b;
+  --color-mood-cyan: #9fd8ff;
+  --color-mood-cold: #5b7cff;
+
+  --color-stardust: #dfe9ff;
+
+  --font-sans: ui-sans-serif, system-ui, -apple-system, 'PingFang SC', 'Hiragino Sans GB',
+    'Microsoft YaHei', sans-serif;
+  --font-mono: ui-monospace, 'SF Mono', Menlo, monospace;
+
+  --ease-river: cubic-bezier(0.22, 0.61, 0.36, 1);
+}
+
+@layer base {
+  html,
+  body,
+  #root {
+    height: 100%;
+  }
+
+  body {
+    margin: 0;
+    overflow: hidden;
+    background: radial-gradient(120% 90% at 50% 0%, #0a0f1f 0%, #05060f 62%, #04050c 100%);
+    color: var(--color-stardust);
+    font-family: var(--font-sans);
+    -webkit-font-smoothing: antialiased;
+    text-rendering: optimizeLegibility;
+    /* 触摸手势层不吃浏览器默认滚动 / 缩放 */
+    touch-action: none;
+    overscroll-behavior: none;
+  }
+
+  canvas {
+    display: block;
+    touch-action: none;
+  }
+
+  /* 焦点可见性：键盘 fallback 必须可操作 */
+  :focus-visible {
+    outline: 1px solid color-mix(in oklab, var(--color-mood-cyan) 70%, transparent);
+    outline-offset: 3px;
+  }
+
+  ::selection {
+    background: color-mix(in oklab, var(--color-mood-warm) 32%, transparent);
+  }
+}
+
+@layer utilities {
+  /* 极淡的胶片颗粒，压住大面积渐变的色带 */
+  .grain::after {
+    content: '';
+    position: fixed;
+    inset: 0;
+    pointer-events: none;
+    opacity: 0.035;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='3'/%3E%3C/filter%3E%3Crect width='120' height='120' filter='url(%23n)'/%3E%3C/svg%3E");
+    mix-blend-mode: screen;
+  }
+}
+
+/* 尊重系统「减少动态效果」偏好（config.PERF.respectReducedMotion） */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+/* ── 设置面板：从右侧滑入（玻璃拟态） ─────────────────────────────── */
+@keyframes settings-slide-in {
+  from {
+    opacity: 0;
+    transform: translate3d(34px, 0, 0) scale(0.992);
+  }
+  to {
+    opacity: 1;
+    transform: translate3d(0, 0, 0) scale(1);
+  }
+}
+
+.settings-panel {
+  animation: settings-slide-in 460ms cubic-bezier(0.22, 0.61, 0.36, 1) both;
+  will-change: transform, opacity;
+}
+
+/* ── 记忆碎片：被引用时浮现的小图标 + 轻微粒子闪烁（阶段 4） ──────────
+   极小、极静：只在「它真的记得」的那一刻出现，不打扰台词。 */
+@keyframes shard-pulse {
+  0%,
+  100% {
+    opacity: 0.55;
+    transform: rotate(45deg) scale(0.94);
+  }
+  50% {
+    opacity: 1;
+    transform: rotate(45deg) scale(1.06);
+  }
+}
+
+@keyframes shard-rise {
+  0% {
+    opacity: 0;
+    transform: translate3d(0, 2px, 0) scale(0.6);
+  }
+  22% {
+    opacity: 0.9;
+  }
+  100% {
+    opacity: 0;
+    transform: translate3d(2px, -9px, 0) scale(1);
+  }
+}
+
+@layer utilities {
+  .memory-shard {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    line-height: 1;
+  }
+
+  .shard-core {
+    width: 6px;
+    height: 6px;
+    transform: rotate(45deg);
+    border: 1px solid color-mix(in oklab, var(--color-mood-cyan) 70%, transparent);
+    background: radial-gradient(
+      circle at 35% 30%,
+      color-mix(in oklab, var(--color-mood-cyan) 85%, transparent),
+      transparent 72%
+    );
+    box-shadow: 0 0 10px color-mix(in oklab, var(--color-mood-cyan) 55%, transparent);
+    animation: shard-pulse 3.4s ease-in-out infinite;
+  }
+
+  .shard-dot {
+    position: absolute;
+    top: -1px;
+    left: 2px;
+    width: 2px;
+    height: 2px;
+    border-radius: 999px;
+    background: color-mix(in oklab, var(--color-mood-cyan) 90%, transparent);
+    box-shadow: 0 0 6px color-mix(in oklab, var(--color-mood-cyan) 80%, transparent);
+    opacity: 0;
+    animation: shard-rise 3s ease-out infinite;
+  }
+
+  .shard-dot:nth-child(3) {
+    animation-delay: 1s;
+    left: 5px;
+  }
+
+  .shard-dot:nth-child(4) {
+    animation-delay: 2s;
+    left: 0;
+  }
+}
