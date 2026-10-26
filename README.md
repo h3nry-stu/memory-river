@@ -639,7 +639,7 @@ src/
 | 预建几张 / 每帧建几个 | `PHOTO.prefetchRadius`（5，提前备好）/ `PHOTO.buildPerFrame`（1，别调大否则会掉帧） |
 | 焦点之外还画几张 | `PHOTO.focusFade`（`l1` 2.4→3.6 / `l2` 1.3→2.1，单位是"张"；超出就完全不画） |
 | 拨动手感（惯性/吸附） | `SCROLL`（`velocityGain` / `inertiaDecayPerSec` / `snapStiffness` / `snapDamping` / `snapDelayMs`） |
-| 扇风灵敏度 | `GESTURE.flick.velocity`（默认 0.95 屏宽/秒；**画中画里的「扇 xx」就是它**） |
+| 扇风灵敏度 | `GESTURE.flick.velocity`（默认 1.2 屏宽/秒；**画中画里的「扇 xx」就是它**） |
 | 扇一下滚几张 | `GESTURE.flick.photosPerSpeed`（1.15）/ `minPhotos` 1 / `maxPhotos` 3.2 |
 | 扇风冷却与冻结 | `flick.cooldownMs` 280 / `flick.zoomFreezeMs` 320 |
 | "手停住"的阈值 | `GESTURE.flick.stillVelocity`（0.22 屏宽/秒）+ `stillSettleMs` |
