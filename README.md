@@ -7,8 +7,9 @@
 > 阶段 5：**照片绑定音乐（L2 循环 / 淡入淡出）+ 三频段驱动粒子 + 手势音效 + 设置/音量**。
 > 阶段计划见 [`docs/PLAN.md`](./docs/PLAN.md)，已确认的设定见 [`docs/DECISIONS.md`](./docs/DECISIONS.md)。
 
-> **项目地址**：<https://github.com/h3nry-stu/memory-river>  
-> 这是本地运行的 Web 应用，不需要服务器。下载后按下面的步骤运行即可。
+> **线上体验**：<https://h3nry-stu.github.io/memory-river/>  
+> **GitHub**：<https://github.com/h3nry-stu/memory-river>  
+> 这是本地优先的 Web 应用，线上可体验视觉、手势和音乐；聊天/识图需要自己的 API Key。
 
 ## 下载与运行（macOS / Windows）
 
