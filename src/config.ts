@@ -1874,8 +1874,8 @@ export const TIMELINE = deepFreeze({
 export const VISION = deepFreeze({
   /** 本地资产路径（PNPM 脚本 prepare:assets 会把 wasm 与模型拷进 public/） */
   assets: {
-    wasmBasePath: '/mediapipe/wasm',
-    modelPath: '/mediapipe/models/hand_landmarker.task',
+    wasmBasePath: `${import.meta.env.BASE_URL}mediapipe/wasm`,
+    modelPath: `${import.meta.env.BASE_URL}mediapipe/models/hand_landmarker.task`,
     /** 以上资产缺失时的兜底 CDN（离线开发时忽略） */
     cdnWasmBasePath: 'https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision@1.1.1/wasm',
     cdnModelPath:

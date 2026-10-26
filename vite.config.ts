@@ -9,6 +9,8 @@ import tailwindcss from '@tailwindcss/vite';
  * 会被隔离策略拦下；默认单线程 wasm 已够 30fps 手部推理。
  */
 export default defineConfig({
+  // GitHub Pages 项目页部署在 /memory-river/ 子路径；本地和 Netlify 仍在根路径
+  base: process.env.GITHUB_PAGES ? '/memory-river/' : '/',
   plugins: [react(), tailwindcss()],
   resolve: {
     alias: {
