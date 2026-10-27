@@ -40,9 +40,17 @@ async function createLandmarker(): Promise<HandLandmarker> {
   const { landmarker } = VISION;
 
   const build = async (wasmBase: string, modelPath: string): Promise<HandLandmarker> => {
-    const fileset = await FilesetResolver.forVisionTasks(wasmBase);
+    // wasm 与模型并行下载：模型不再等 wasm 初始化完才串行开始
+    const [fileset, modelBuffer] = await Promise.all([
+      FilesetResolver.forVisionTasks(wasmBase),
+      fetch(modelPath, { cache: 'force-cache' }).then(async (response) => {
+        if (!response.ok) throw new Error(`model HTTP ${response.status}`);
+        return new Uint8Array(await response.arrayBuffer());
+      }),
+    ]);
+
     return HandLandmarker.createFromOptions(fileset, {
-      baseOptions: { modelAssetPath: modelPath, delegate: landmarker.delegate },
+      baseOptions: { modelAssetBuffer: modelBuffer, delegate: landmarker.delegate },
       runningMode: 'VIDEO',
       numHands: landmarker.numHands,
       minHandDetectionConfidence: landmarker.minHandDetectionConfidence,
@@ -51,13 +59,27 @@ async function createLandmarker(): Promise<HandLandmarker> {
     });
   };
 
-  try {
-    // 先用本地资产（离线可跑）
-    return await build(VISION.assets.wasmBasePath, VISION.assets.modelPath);
-  } catch (error) {
-    console.warn('[gesture] 本地模型不可用，回落 CDN', error);
-    return await build(VISION.assets.cdnWasmBasePath, VISION.assets.cdnModelPath);
+  // 线上优先 CDN：GitHub Pages 的 13MB wasm 很慢；本地开发仍用本地资产。
+  const candidates = import.meta.env.DEV
+    ? [
+        [VISION.assets.wasmBasePath, VISION.assets.modelPath],
+        [VISION.assets.cdnWasmBasePath, VISION.assets.cdnModelPath],
+      ]
+    : [
+        [VISION.assets.cdnWasmBasePath, VISION.assets.cdnModelPath],
+        [VISION.assets.wasmBasePath, VISION.assets.modelPath],
+      ];
+
+  let lastError: unknown = null;
+  for (const [wasmBase, modelPath] of candidates) {
+    try {
+      return await build(wasmBase!, modelPath!);
+    } catch (error) {
+      lastError = error;
+      console.warn('[gesture] 模型源不可用，尝试下一个源', wasmBase, error);
+    }
   }
+  throw lastError instanceof Error ? lastError : new Error('模型加载失败');
 }
 
 export function createHandTracker(callbacks: TrackerCallbacks): HandTracker {
@@ -153,6 +175,10 @@ export function createHandTracker(callbacks: TrackerCallbacks): HandTracker {
       stopping = false;
       detectFailures = 0;
 
+      // 模型下载与摄像头授权并行，避免先等用户点“允许”再开始下 13MB wasm。
+      const modelPromise = createLandmarker();
+      modelPromise.catch(() => undefined);
+
       // ① 摄像头
       try {
         stream = await navigator.mediaDevices.getUserMedia({
@@ -203,9 +229,9 @@ export function createHandTracker(callbacks: TrackerCallbacks): HandTracker {
 
       await video.play().catch(() => undefined);
 
-      // ② 模型
+      // ② 模型（通常此时已下载/初始化完成）
       try {
-        landmarker = await createLandmarker();
+        landmarker = await modelPromise;
       } catch (error) {
         console.warn('[gesture] 模型加载失败', error);
         releaseCamera();

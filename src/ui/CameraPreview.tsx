@@ -349,12 +349,16 @@ export function CameraPreview() {
               style={{ height: `${Math.round(readout.open * 100)}%` }}
             />
           </div>
-          {(!ready || gestureStatus === 'unavailable') && (
+          {(!ready ||
+            gestureStatus === 'unavailable' ||
+            (ready && gestureStatus === 'idle' && inputMode === 'gesture')) && (
             <div className="absolute inset-0 grid place-items-center px-3 text-center">
               <p className="font-mono text-[8.5px] leading-relaxed tracking-[0.16em] text-stardust/40">
                 {gestureStatus === 'unavailable'
                   ? '摄像头不可用\n已切到鼠标模式（按 G 重试）'
-                  : '摄像头启动中…'}
+                  : ready && gestureStatus === 'idle' && inputMode === 'gesture'
+                    ? '手势模型加载中…\n首次约 8–15 秒'
+                    : '摄像头启动中…'}
               </p>
             </div>
           )}
